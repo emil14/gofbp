@@ -1,29 +1,29 @@
 package main
 
 import (
-	"reflect"
-	"runtime"
-
-	comp "github.com/jpaulm/gofbp/components/sender"
+	"github.com/jpaulm/gofbp/components/test-rtns/receiver"
+	"github.com/jpaulm/gofbp/components/test-rtns/sender"
 	"github.com/jpaulm/gofbp/core"
 )
 
-func getTypeName(t reflect.Type) string {
-	return t.Name()
-}
-
 func main() {
-	runtime.GOMAXPROCS(4)
-
 	var net *core.Network = core.NewNetwork("test_net")
 
-	proc := net.NewProc(comp.Execute)
+	proc := net.NewProc("Sender", sender.Execute)
+	//proc.Name = "Sender"
 
-	proc.OutConn = net.NewConnection()
+	proc1a := net.NewProc("Sender2", sender.Execute)
+	//proc1a.Name = "Sender2"
 
-	net.Wg.Add(1)
-	go proc.Run(net.Wg)
-	net.Wg.Wait()
+	proc.OutConn = net.NewConnection(6)
+
+	proc2 := net.NewProc("Receiver", receiver.Execute) // Note different import key!
+	//proc2.Name = "Receiver"
+
+	proc2.InConn = proc.OutConn
+	proc1a.OutConn = proc.OutConn // 2 outputs feeding 1 input (legal in FBP)
+
+	proc.OutConn.UpStrmCnt = 2
 
 	net.Run()
 }
