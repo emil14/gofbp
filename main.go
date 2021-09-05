@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"runtime"
 
-	"github.com/jpaulm/gofbp/components"
+	comp "github.com/jpaulm/gofbp/components/sender"
 	"github.com/jpaulm/gofbp/core"
 )
 
@@ -17,7 +17,7 @@ func main() {
 
 	var net *core.Network = core.NewNetwork("test_net")
 
-	proc := net.NewProc(components.Execute)
+	proc := net.NewProc(comp.Execute)
 
 	proc.OutConn = net.NewConnection()
 
